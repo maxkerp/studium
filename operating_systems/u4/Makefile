@@ -7,9 +7,8 @@ default:: a1.exe
 clean::
 	-rm -f *.exe *.o
 
-# kleines Testbeispiel
 run:: a1.exe
-	./$< 4 2
+	./$<
 
 a1.exe: a1.o
 	$(CC) -o $@ $< $(LDFLAGS)
