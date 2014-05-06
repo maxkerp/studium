@@ -3,8 +3,9 @@
  * Author: Maximilian Kerp
  * Gruop:  7
  * Date:   30.04.2014
-
+ *
 =====================================================================*/
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <pthread.h>
