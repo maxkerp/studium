@@ -8,7 +8,7 @@ clean::
 
 # kleines Testbeispiel
 run:: TreeCalculation.class
-	$(JAVA) TreeCalculation 4 1 2
+	$(JAVA) TreeCalculation 14 1 4
 
 TreeCalculation.class: TreeCalculation.java
 	$(JAVAC) $<
