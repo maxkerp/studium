@@ -96,7 +96,7 @@ public class TreeCalculation {
 	}
 
 	// print timing
-	System.out.printf("tree height: %2d\nSequential: %.6f\nParallel: %3d threads, %6d tasks: %.6f\nspeedup: %.3f\ncount: %d\n",
+	System.out.printf("tree height: %2d sequential: %.6f parallel with %3d threads and %6d tasks: %.6f  speedup: %.3f count: %d\n",
 			  height, t1, threadCount, tc.totalTasks, t2, t1 / t2, ref);
     }
 }
