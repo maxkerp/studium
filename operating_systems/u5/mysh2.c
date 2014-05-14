@@ -12,7 +12,7 @@
 #define PARENT       1
 #define CHILD        0
 
-// Erstelle zwei Pipes zur bidirektionalen Kommunikation zwischen 
+// Erstelle zwei Pipes zur bidirektionalen Kommunikation zwischen
 // Eltern- und Kindprozess.
 
 int pipes            [NUM_OF_PIPES][NUM_OF_PIPES];
@@ -38,7 +38,7 @@ void parser(char *cmd){
    pipe(pipes[CHILD]);
 
    if( (pid = fork()) == 0){
-   
+
       // Dupliziere alten File Descriptor auf neuen FD.
       dup2(CHILD_READ, STDIN_FILENO);
       dup2(CHILD_WRITE, STDOUT_FILENO);
@@ -49,7 +49,9 @@ void parser(char *cmd){
       close(PARENT_WRITE);
 
       // Auslesen des Befehls aus dem Pipe und ausführen mit execlp
-      execl("/bin/sh","/bin/sh","-c", NULL);
+      char buffer[MAX];
+      int out = read(CHILD_READ, buffer, sizeof(buffer)-1);
+      execlp(buffer, buffer, NULL);
 
    } else if(pid > 0) {
       // Nicht benutzte Pipes werden geschlossen.
@@ -69,7 +71,7 @@ void parser(char *cmd){
         } else {
             printf("IO Error\n");
         }
-   } 
+   }
 }
 
 int main(){
