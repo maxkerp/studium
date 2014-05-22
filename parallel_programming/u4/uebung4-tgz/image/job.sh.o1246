@@ -1,0 +1,61 @@
+Programm wird ausgeführt auf  wr17
+export OMP_NUM_THREADS=1
+./image.exe -n Test.tiff
+time Laplace edge detection: 0.067929 s
+checksum Laplace OK        : 217015525
+time Sobel filter          : 0.040244 s
+checksum Sobel OK          : 302231239
+export OMP_NUM_THREADS=2
+./image.exe -n Test.tiff
+time Laplace edge detection: 0.065167 s
+checksum Laplace OK        : 217015525
+time Sobel filter          : 0.055312 s
+checksum Sobel OK          : 302231239
+export OMP_NUM_THREADS=4
+./image.exe -n Test.tiff
+time Laplace edge detection: 0.050651 s
+checksum Laplace OK        : 217015525
+time Sobel filter          : 0.075554 s
+checksum Sobel OK          : 302231239
+export OMP_NUM_THREADS=8
+./image.exe -n Test.tiff
+time Laplace edge detection: 0.054198 s
+checksum Laplace OK        : 217015525
+time Sobel filter          : 0.066503 s
+checksum Sobel OK          : 302231239
+export OMP_NUM_THREADS=12
+./image.exe -n Test.tiff
+time Laplace edge detection: 0.062058 s
+checksum Laplace OK        : 217015525
+time Sobel filter          : 0.055447 s
+checksum Sobel OK          : 302231239
+export OMP_NUM_THREADS=16
+./image.exe -n Test.tiff
+time Laplace edge detection: 0.063391 s
+checksum Laplace OK        : 217015525
+time Sobel filter          : 0.093135 s
+checksum Sobel OK          : 302231239
+export OMP_NUM_THREADS=24
+./image.exe -n Test.tiff
+time Laplace edge detection: 0.058369 s
+checksum Laplace OK        : 217015525
+time Sobel filter          : 0.053695 s
+checksum Sobel OK          : 302231239
+export OMP_NUM_THREADS=32
+./image.exe -n Test.tiff
+time Laplace edge detection: 0.054599 s
+checksum Laplace OK        : 217015525
+time Sobel filter          : 0.063597 s
+checksum Sobel OK          : 302231239
+export OMP_NUM_THREADS=48
+./image.exe -n Test.tiff
+time Laplace edge detection: 0.058418 s
+checksum Laplace OK        : 217015525
+time Sobel filter          : 0.082054 s
+checksum Sobel OK          : 302231239
+export OMP_NUM_THREADS=64
+./image.exe -n Test.tiff
+time Laplace edge detection: 0.060674 s
+checksum Laplace OK        : 217015525
+time Sobel filter          : 0.106662 s
+checksum Sobel OK          : 302231239
