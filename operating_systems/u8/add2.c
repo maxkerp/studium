@@ -1,19 +1,22 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+
 
 int main( int argc, char **argv)
 {
-  if ( argc != 3)
-    printf("usage: add2 arg1 arg2 ");
+  //read two ints from stdin
+  char arg1[11], arg2[11];
+  read(0, &arg1, sizeof(char[11]));
+  read(0, &arg2, sizeof(char[11]));
 
-  int arg1 = atoi(argv[1]);
-  int arg2 = atoi(argv[2]);
+  // convert and compute the sum
+  int a = atoi(arg1);
+  int b = atoi(arg2);
+  int sum = a + b;
 
-  int sum = arg1 + arg2;
-
-  printf("arg1 = %i, arg2 = %i\n", arg1, arg2);
-  printf("Sum is: %i\n", sum);
-
+  // print it to stdout
+  printf("%d\n", sum);
 
   return 0;
 }

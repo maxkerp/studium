@@ -28,25 +28,27 @@ int main( int argc, char **argv)
   // since add2 writes to stdout, but we want it to write back to the
   // parent.
   if(!pid){
+    //DEBUG
     // we don't write to that
     close(parent_child[1]);
 
     // everything written to stdout will go to cp[1]
     dup2(child_parent[1], 1);
 
-    // read two ints from pc_pipe
-    int i1, i2;
-    fscanf(parent_child[0], "%d", &i1);
-    fscanf(parent_child[0], "%d", &i2);
+    // DEBUG: read one int
+    //int a,b;
+    //read(parent_child[0], &a, sizeof(int));
+    //read(parent_child[0], &b, sizeof(int));
+    //printf("before exec: a:%d, b:%d\n", a,b);
+    //close(parent_child[0]);
 
-    // convert ints to strings
-    char *arg1, *arg2;
-    sprintf(arg1, "%d", i1);
-    sprintf(arg2, "%d", i2);
+    // everything read from stdin will come from pc[0];
+    dup2(parent_child[0], 0);
+
 
     // execute add2 with the (converted) ints from the pipe pc
     // add will wrtite to stdout which is now cp[1]
-    int i = execl("./add2", "./add2", arg1, arg2, NULL);
+    int i = execl("./add2", "./add2", NULL);
     if(i == -1)
       printf("ERROR executing\n");
 
@@ -63,20 +65,19 @@ int main( int argc, char **argv)
   close(child_parent[1]);
 
   // read two ints from the keyboard
-  int arg1, arg2;       // args to send to child
-  scanf("%d", &arg1);
-  scanf("%d", &arg2);
+  char arg1[11], arg2[11];       // args to send to child
+  read(0, &arg1, sizeof(char[11]));
+  read(0, &arg2, sizeof(char[11]));
 
-  // write to the pc_pipe
-  fprintf(parent_child[1], "%d", arg1);
-  fprintf(parent_child[1], "%d", arg2);
+  // write to the pc_pipe and close
+  write(parent_child[1], &arg1, sizeof(char[11]));
+  write(parent_child[1], &arg2, sizeof(char[11]));
+  close(parent_child[1]);
 
-  // read answer from cp_pipe
-  int sum;
-  fscanf(child_parent[0], "%d", &sum);
-
-  // write answer to the terminal
-  printf("Sum: %d", sum);
+  // everything coming from child_parent should go to stdoud
+  char sum[11];
+  read(child_parent[0], &sum, sizeof(char[11]));
+  printf("SUM: %s\n", sum);
 
   return 0;
 }
