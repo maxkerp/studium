@@ -1,5 +1,19 @@
-#include <stdio.h>
-#include <unistd.h>
+/*************************************************************************
+ * Author:  Maximilain Kerp
+ * Group:   5
+ * Date:    31.05.14
+ * Purpose: The goal of this programm was to inter-process cummunication
+ *          using pipes. The parent reads in two integers from the
+ *          keyboard and writes it to a pipe(parent_child). The child let's the
+ *          read end of parent_child become the stdin for it's own process and
+ *          let's stdout be the write end of another pipe to the parent (child_parent).
+ *          After that, the child executes a programm which reads in two
+ *          integers from stdin and writes out to stdout. At last the parent
+ *          reads from the pipe coming from the child (child_parent) and prints out
+ *          whatever the program has written to stdout.
+ ***************************************************************************/
+#include <stdio.h>        // printf
+#include <unistd.h>       // fork(), read(), write(), pipe(), dup2()
 
 int main( int argc, char **argv)
 {
@@ -8,7 +22,6 @@ int main( int argc, char **argv)
   pid_t pid;            // pid of child process
   int parent_child[2];  // pipe from parent to child
   int child_parent[2];  // pipe from child to parent
-
 
   // create pipes, abort when error
   if(pipe(parent_child) == -1)
@@ -23,31 +36,24 @@ int main( int argc, char **argv)
     printf("ERROR forking\n");
 
   // Now we are in the child process.
-  // We need to read the 2 ints from parent_child[0], give them to
-  // execl as arguments for add2 and map stdout to child_parent[1]
-  // since add2 writes to stdout, but we want it to write back to the
-  // parent.
+  // we let parent_child[0] be stdin for this process and
+  // child_parent[1] be stdout.
   if(!pid){
-    //DEBUG
-    // we don't write to that
+
+    // we're just reading from this pipe, so close it's write end
     close(parent_child[1]);
 
-    // everything written to stdout will go to cp[1]
-    dup2(child_parent[1], 1);
+    // everything read from stdin in this process
+    // will come from parent_child[0]
+    dup2(parent_child[0], STDIN_FILENO);
 
-    // DEBUG: read one int
-    //int a,b;
-    //read(parent_child[0], &a, sizeof(int));
-    //read(parent_child[0], &b, sizeof(int));
-    //printf("before exec: a:%d, b:%d\n", a,b);
-    //close(parent_child[0]);
+    // everything written to stdout in this process
+    // will go to child_parent[1]
+    dup2(child_parent[1], STDOUT_FILENO);
 
-    // everything read from stdin will come from pc[0];
-    dup2(parent_child[0], 0);
-
-
-    // execute add2 with the (converted) ints from the pipe pc
-    // add will wrtite to stdout which is now cp[1]
+    // execute add2, it will now read from parent_child[0]
+    // instead of stdin and write to child_parent[1] instead
+    // of stdout
     int i = execl("./add2", "./add2", NULL);
     if(i == -1)
       printf("ERROR executing\n");
@@ -55,26 +61,27 @@ int main( int argc, char **argv)
   }
 
   // Here we are in the parent process. We read to ints from the
-  // keyboard. Write them to the pipe. Then we read the answer from
-  // cp_pipe and write it to stdout (terminal)
+  // keyboard and write them to parent_child[1].
+  // At last we read from child_parent[0] and print its content
+  // to stdout which is now the terminal.
 
-  // we don't read from that
+  // we're just writing to this pipe, so close it's read end.
   close(parent_child[0]);
 
-  // we don't write to that
+  // we're just reading from this pipe, so close it's write end
   close(child_parent[1]);
 
-  // read two ints from the keyboard
+  // read two ints from stdin
   char arg1[11], arg2[11];       // args to send to child
-  read(0, &arg1, sizeof(char[11]));
-  read(0, &arg2, sizeof(char[11]));
+  read(STDIN_FILENO, &arg1, sizeof(char[11]));
+  read(STDIN_FILENO, &arg2, sizeof(char[11]));
 
-  // write to the pc_pipe and close
+  // write to parent_child and close
   write(parent_child[1], &arg1, sizeof(char[11]));
   write(parent_child[1], &arg2, sizeof(char[11]));
   close(parent_child[1]);
 
-  // everything coming from child_parent should go to stdoud
+  // read from child_parent and print to stdout
   char sum[11];
   read(child_parent[0], &sum, sizeof(char[11]));
   printf("SUM: %s\n", sum);
