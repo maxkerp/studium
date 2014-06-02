@@ -6,20 +6,14 @@
  *          and print the sum to stdout.
  **********************************************************/
 #include <stdio.h>      // printf()
-#include <stdlib.h>     // atoi()
-#include <unistd.h>     // read()
-
 
 int main( int argc, char **argv)
 {
   //read two ints from stdin
-  char arg1[11], arg2[11];
-  read(STDIN_FILENO, &arg1, sizeof(char[11]));
-  read(STDIN_FILENO, &arg2, sizeof(char[11]));
+  int a,b;
+  scanf("%d %d", &a, &b);
 
-  // convert ints and compute the sum
-  int a = atoi(arg1);
-  int b = atoi(arg2);
+  // compute the sum
   int sum = a + b;
 
   // print sum to stdout

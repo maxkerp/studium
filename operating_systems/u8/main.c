@@ -12,14 +12,15 @@
  *          reads from the pipe coming from the child (child_parent) and prints out
  *          whatever the program has written to stdout.
  ***************************************************************************/
-#include <stdio.h>        // printf
+#include <stdio.h>        // printf(), fprintf(), scanf(), fscanf()
 #include <unistd.h>       // fork(), read(), write(), pipe(), dup2()
 
 int main( int argc, char **argv)
 {
   //===========================================================
-  // needed variable
+  // needed variables
   pid_t pid;            // pid of child process
+  FILE *parent_read,*parent_write; // file streams needed to use stdio on pipes
   int parent_child[2];  // pipe from parent to child
   int child_parent[2];  // pipe from child to parent
 
@@ -60,7 +61,7 @@ int main( int argc, char **argv)
 
   }
 
-  // Here we are in the parent process. We read to ints from the
+  // Here we are in the parent process. We read two ints from the
   // keyboard and write them to parent_child[1].
   // At last we read from child_parent[0] and print its content
   // to stdout which is now the terminal.
@@ -71,20 +72,23 @@ int main( int argc, char **argv)
   // we're just reading from this pipe, so close it's write end
   close(child_parent[1]);
 
+  int a,b,sum;
+
   // read two ints from stdin
-  char arg1[11], arg2[11];       // args to send to child
-  read(STDIN_FILENO, &arg1, sizeof(char[11]));
-  read(STDIN_FILENO, &arg2, sizeof(char[11]));
+  scanf("%d %d", &a, &b);
+
+  // open file streams of the pipe so we can use fprintf and
+  // fscanf on the pipe.
+  parent_write = fdopen(parent_child[1], "w");
+  parent_read = fdopen(child_parent[0], "r");
 
   // write to parent_child and close
-  write(parent_child[1], &arg1, sizeof(char[11]));
-  write(parent_child[1], &arg2, sizeof(char[11]));
-  close(parent_child[1]);
+  fprintf(parent_write, "%d %d", a,b);
+  fclose(parent_write);
 
   // read from child_parent and print to stdout
-  char sum[11];
-  read(child_parent[0], &sum, sizeof(char[11]));
-  printf("SUM: %s\n", sum);
+  fscanf(parent_read, "%d", &sum);
+  printf("SUM: %d\n", sum);
 
   return 0;
 }
