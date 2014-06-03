@@ -478,11 +478,13 @@ main (int argc, char **argv)
       calculate_forces ();
       move_bodies ();
 
-  // print out calculation speed every second
-  t0 = gettime () - t0;
-  printf ("time nbody : %.6f\r", t0);
-    }
+			/* print out calculation speed every second
+			t0 = gettime () - t0;
+			printf ("time nbody : %.6f\r", t0);
+			*/
+		}
 
+	t0 = gettime() - t0;
   printf ("time nbody : %.6f\n", t0);
 
   unsigned long cs = checksum();

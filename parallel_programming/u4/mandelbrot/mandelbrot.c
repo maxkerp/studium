@@ -1,12 +1,12 @@
 /*==============================================================================
-  
+
    Purpose:    sequential Mandelbrot
    Author:     Rudolf Berrendorf
                Computer Science Department
                Bonn-Rhein-Sieg University
 	       53754 Sankt Augustin, Germany
                rudolf.berrendorf@h-brs.de
-  
+
 ==============================================================================*/
 
 #include <stdio.h>
@@ -18,7 +18,7 @@
 #include <libFHBRS.h>
 
 
-#define	X_RESOLUTION 800       /* number of pixels in x-direction */
+#define	X_RESOLUTION 1000       /* number of pixels in x-direction */
 #define	Y_RESOLUTION 800       /* number of pixels in y-direction */
 
 
@@ -28,7 +28,7 @@
 static int display = 1;
 // calculate checksum
 static unsigned long checksum = 0;
-#define REFERENCE_CHECKSUM 3018428913UL
+#define REFERENCE_CHECKSUM 3775983838UL
 
 /*==============================================================================*/
 /* get command line arguments
@@ -36,7 +36,7 @@ static unsigned long checksum = 0;
    example a.out -2 -2 2 2 1000
  */
 
-static void get_arguments(int argc,        // I: argument count
+static void get_arguments(int argc,        // I: arexport OMP_NUM_THREADS=2gument count
 			  char **argv,     // I: argument vector
 			  double *xmin,    // O: minimum x coordinate
 			  double *ymin,    // O: minimum y ccordinate
@@ -65,27 +65,21 @@ static void get_arguments(int argc,        // I: argument count
 /*==============================================================================*/
 /* draw point */
 
-
-  static void
+static void
 drawPoint(int window, int i, int j, int anziter, int maxiter)
-{  
-  
-  // update checksum   
+{
+  // update checksum
   checksum += anziter;
 
   if(display)
     {
       if (anziter == maxiter)
-  graphic_setColor(window, GRAPHIC_MAX_COLOR-1);
+	graphic_setColor(window, GRAPHIC_MAX_COLOR-1);
       else
-  graphic_setColor(window, anziter%GRAPHIC_MAX_COLOR);
+	graphic_setColor(window, anziter%GRAPHIC_MAX_COLOR);
       graphic_drawPoint(window, i, j);
     }
-}  
-  
-
-
-
+}
 
 
 /*==============================================================================*/
@@ -108,12 +102,11 @@ int main (int argc, char **argv)
 
   if(display)
     window = graphic_start(X_RESOLUTION, Y_RESOLUTION, argv[0]);
-  dx = (xmax - xmin) / X_RESOLUTION; 
+  dx = (xmax - xmin) / X_RESOLUTION;
   dy = (ymax - ymin) / Y_RESOLUTION;
   printf("display of (%.5f,%.5f)-(%.5f,%.5f) in steps of (%.5f,%.5f)\n",
 	 xmin,ymin,xmax,ymax,dx,dy);
 
-  
 
   /* get start time */
   t_start = gettime();
@@ -121,47 +114,42 @@ int main (int argc, char **argv)
   /*--------------------------------------------------------------------------*/
 
   /* calculate values for every point in complex plane */
-  #pragma omp parallel private(j,c,z,k,absvalue, temp) shared(window)
+  #pragma omp parallel private(i,j,c,z,k,absvalue, temp) shared(window)
   {
 
-  #pragma omp for 
-    for(i = 0; i < X_RESOLUTION; i++) 
+  #pragma omp for
+    for(i = 0; i < X_RESOLUTION; i++)
+      {
+        for(j = 0; j < Y_RESOLUTION; j++)
     {
-      for(j = 0; j < Y_RESOLUTION; j++)
-  {
-    /* map point to window */
-          c.real = xmin + i * dx;
-    c.imag = ymin + j * dy;
-          z.real = z.imag = 0.0;
-          k = 0;
+      /* map point to window */
+            c.real = xmin + i * dx;
+      c.imag = ymin + j * dy;
+            z.real = z.imag = 0.0;
+            k = 0;
 
-    // do iterations for point i,j
-          do  {
-            temp = z.real*z.real - z.imag*z.imag + c.real;
-            z.imag = 2.0*z.real*z.imag + c.imag;
-            z.real = temp;
-            absvalue = z.real*z.real+z.imag*z.imag;
-            k++;
-          } while (absvalue < 4.0 && k < maxiter);
+      // do iterations for point i,j
+            do  {
+              temp = z.real*z.real - z.imag*z.imag + c.real;
+              z.imag = 2.0*z.real*z.imag + c.imag;
+              z.real = temp;
+              absvalue = z.real*z.real+z.imag*z.imag;
+              k++;
+            } while (absvalue < 4.0 && k < maxiter);
 
-    // draw point i,j
-    
-    #pragma omp critical
-    {
+      #pragma omp critical
+      {
+      // draw point i,j
       drawPoint(window, i,j,k,maxiter);
-    }
-    
-    
+      }
 
-   }
-
-      if(display)
-         // flush graphic
-         graphic_flush(window);
     }
 
+        if(display)
+    // flush graphic
+    graphic_flush(window);
+      }
   }
-  
 
   /*--------------------------------------------------------------------------*/
 

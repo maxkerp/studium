@@ -1,3 +1,7 @@
+Benutzen wie im Makefile angegeben den Intel C Compiler.
+Dazu müssen Sie vorher einmalig ausführen:
+    module load intel-icc
+
 In Verzeichnis liegen folgende Dateien:
 
 1) mandelbrot.c
@@ -13,5 +17,5 @@ Makefile zum Übersetzen und Starten des Programms
 - make run2 : führt das Programm ohne grafische Ausgabe aus (Zeitmessungen)
 
 3) job.sh Für Zeitmessungen steht diese Skript zur Verfügung, dass den
-Rechner wr17 mit 48 Prozessorkernen (also allen verfügbaren) anfordert
+Rechner wr8 mit 48 Prozessorkernen (also allen verfügbaren) anfordert
 und dort das Mandelbrot-Programm ohne grafische Ausgabe startet.

@@ -1,10 +1,10 @@
-# GNU compiler
-CC	= cc -fopenmp
-# Intel OpenMP compiler
-#CC	= icc -openmp
+# Intel compiler
+CC	= icc -openmp -fp-model strict
+# sequentiell
+#CC	= icc -fp-model strict
 
-CFLAGS	= -O0 -g -Wall -std=c99 -I/usr/local/include
-LDLIBS	= -L/usr/local/lib -lFHBRS -L/usr/X11R6/lib -ltiff -lX11 -lpthread -lm
+CFLAGS	= -O2 -g -Wall -std=c99 -I/usr/local/include
+LDLIBS	= -L/usr/local/lib -lFHBRS -ltiff -lX11 -lpthread -lm
 
 
 default:: image.exe
@@ -15,25 +15,6 @@ run:: image.exe
 
 # ohne grafische Ausgabe
 run2:: image.exe
-	export OMP_NUM_THREADS=1
-	./image.exe -n Test.tiff
-	export OMP_NUM_THREADS=2
-	./image.exe -n Test.tiff
-	export OMP_NUM_THREADS=4
-	./image.exe -n Test.tiff
-	export OMP_NUM_THREADS=8
-	./image.exe -n Test.tiff
-	export OMP_NUM_THREADS=12
-	./image.exe -n Test.tiff
-	export OMP_NUM_THREADS=16
-	./image.exe -n Test.tiff
-	export OMP_NUM_THREADS=24
-	./image.exe -n Test.tiff
-	export OMP_NUM_THREADS=32
-	./image.exe -n Test.tiff
-	export OMP_NUM_THREADS=48
-	./image.exe -n Test.tiff
-	export OMP_NUM_THREADS=64
 	./image.exe -n Test.tiff
 
 clean::
