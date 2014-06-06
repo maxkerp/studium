@@ -5,9 +5,9 @@
  *
  * What does this program do:
  *
- * This program creates a shell which reads from STDIN creates a
- * a subprocess which executes the command using exec() and writes
- * out to STDOUT using a file descriptor.
+ * This program creates to processes, the parent writes a string to
+ * a pipe and the child reads this string from the pipe and prints
+ * it to the terminal.
  *
  ******************************************************************/
 #define MAX 50
@@ -24,7 +24,7 @@
    int fd[2]; // array of file descriptors
    pid_t childpid = NULL; // childprocess
    void *buffer = calloc(MAX, sizeof(char));
-   char string[] = "Hi there!\n";
+   char string[] = "Hello World!\n";
 
    pipe(fd); // create pipe
 

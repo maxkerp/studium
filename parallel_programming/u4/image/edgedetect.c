@@ -1,12 +1,12 @@
 /*==============================================================================
-  
+
    Purpose:    algorithms for edge detection
    Author:     Rudolf Berrendorf
                Computer Science Department
                Bonn-Rhein-Sieg University
 	       53754 Sankt Augustin, Germany
                rudolf.berrendorf@h-brs.de
-  
+
 ==============================================================================*/
 
 /*============================================================================*/
@@ -16,19 +16,20 @@
    - edge detection with Sobel operator (edgedetect_sobel)
      (3x3 and 5x5 operators)
 
-   See for example: Th.Br‰unl: Parallel Image Processing, Springer 2001
+   See for example: Th.Br√§unl: Parallel Image Processing, Springer 2001
 */
 
 /*============================================================================*/
 
-#include "edgedetect.h"
-#include "gray.h"
-
-#include <libFHBRS.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 #include <math.h>
+
+#include <libFHBRS.h>
+
+#include "edgedetect.h"
+#include "gray.h"
 
 #define PI 3.14159265358979323846
 
@@ -68,8 +69,8 @@ checksum (int height,                  // I: image height
    ----------------
  */
 
-int  edgedetect_laplace (
-          int height,        // I: image height
+int
+  edgedetect_laplace (int height,        // I: image height
 		      int width,         // I: image width
 		      gray_t image[height][width],        // I: input image
 		      gray_t new_image[height][width])    // O: output image
@@ -79,25 +80,32 @@ int  edgedetect_laplace (
   double t0, t1;
 
 
-  // just for reproducable checksums...
-  memset(new_image, 0, height*width*sizeof(new_image[0][0]));
-
-  /*--------------------------------------------------------------------------*/
-  /* apply algorithm */
-
+  // start timing
   t0 = gettime();
 
-#pragma omp parallel for private(val, j)
-  for(i=1; i<height-1; i++)
-    for(j=1; j<width-1; ++j) {
-      // apply laplace operator
-      val = 4 * image[i][j] - image[i - 1][j] - image[i + 1][j] - image[i][j - 1] - image[i][j + 1];
-
-      /* store calculated value (map to correct range) */
-      new_image[i][j] = min (val, GRAY_MAX);
+  // just for reproducable checksums...
+  for(i=0; i<height; i++)
+    {
+      for(j=0; j<width; j++)
+	{
+	  new_image[i][j] = 0;
+	}
     }
 
+  #pragma omp parallel for private(val, j)
+  for(i=1; i<height-1; i++)
+    {
+      for(j=1; j<width-1; ++j)
+	{
+	  // apply laplace operator
+	  val = 4 * image[i][j] - image[i - 1][j] - image[i + 1][j] - image[i][j - 1] - image[i][j + 1];
 
+	  /* store calculated value (map to correct range) */
+	  new_image[i][j] = min (val, GRAY_MAX);
+	}
+    }
+
+  // end timing
   t1 = gettime();
 
   printf("time Laplace edge detection: %.6f s\n", t1-t0);
@@ -145,8 +153,7 @@ int  edgedetect_laplace (
  */
 
 static void
-  edgedetect_sobel5x5 (
-           int height,       // I: image height
+  edgedetect_sobel5x5 (int height,       // I: image height
 		       int width,        // I: image width
 		       gray_t image[height][width],       // I: input image
 		       int value[height][width],  // I: sobel output value
@@ -159,69 +166,73 @@ static void
   if(direction == 0) {
 
     /* x direction */
-#pragma omp for private(j)
+    #pragma omp for private(j)
     for(i=2; i<height-2; i++)
-      for(j=2; j<width-2; j++)
-	{
-	  // apply Sobel operator
-	  value[i][j] =
-	    (gray_t)(
-		     - 0.5 * image[i - 2][j - 2]
-		     - 0.4 * image[i - 2][j - 1]
-		     + 0.4 * image[i - 2][j + 1]
-		     + 0.5 * image[i - 2][j + 2]
-		     - 0.8 * image[i - 1][j - 2]
-		     - 1.0 * image[i - 1][j - 1]
-		     + 1.0 * image[i - 1][j + 1]
-		     + 0.8 * image[i - 1][j + 2]
-		     - 1.0 * image[i][j - 2]
-		     - 2.0 * image[i][j - 1]
-		     + 2.0 * image[i][j + 1]
-		     + 1.0 * image[i][j + 2]
-		     - 0.8 * image[i + 1][j - 2]
-		     - 1.0 * image[i + 1][j - 1]
-		     + 1.0 * image[i + 1][j + 1]
-		     + 0.8 * image[i + 1][j + 2]
-		     - 0.5 * image[i + 2][j - 2]
-		     - 0.4 * image[i + 2][j - 1]
-		     + 0.4 * image[i + 2][j + 1]
-		     + 0.5 * image[i + 2][j + 2]
-		     );
-        }
+      {
+	for(j=2; j<width-2; j++)
+	  {
+	    // apply Sobel operator
+	    value[i][j] =
+	      (gray_t)(
+		        -0.5 * image[i - 2][j - 2]
+		       - 0.4 * image[i - 2][j - 1]
+		       + 0.4 * image[i - 2][j + 1]
+		       + 0.5 * image[i - 2][j + 2]
+		       - 0.8 * image[i - 1][j - 2]
+		       - 1.0 * image[i - 1][j - 1]
+		       + 1.0 * image[i - 1][j + 1]
+		       + 0.8 * image[i - 1][j + 2]
+		       - 1.0 * image[i    ][j - 2]
+		       - 2.0 * image[i    ][j - 1]
+		       + 2.0 * image[i    ][j + 1]
+		       + 1.0 * image[i    ][j + 2]
+		       - 0.8 * image[i + 1][j - 2]
+		       - 1.0 * image[i + 1][j - 1]
+		       + 1.0 * image[i + 1][j + 1]
+		       + 0.8 * image[i + 1][j + 2]
+		       - 0.5 * image[i + 2][j - 2]
+		       - 0.4 * image[i + 2][j - 1]
+		       + 0.4 * image[i + 2][j + 1]
+		       + 0.5 * image[i + 2][j + 2]
+		       );
+	  }
+      }
   }
-  
+
   else {
 
     /* y direction */
-#pragma omp for private(j)
+    #pragma omp for private(j)
     for(i=2; i<height-2; i++)
-      for(j=2; j<width-2; j++)
-	{
-	  // apply Sobel operator
-	  value[i][j] = 
-	    (gray_t)(
-		     + 0.5 * image[i - 2][j - 2]
-		     + 0.8 * image[i - 2][j - 1]
-		     + 1.0 * image[i - 2][j]
-		     + 0.8 * image[i - 2][j + 1]
-		     + 0.5 * image[i - 2][j + 2]
-		     + 0.4 * image[i - 1][j - 2]
-		     + 1.0 * image[i - 1][j - 1]
-		     + 2.0 * image[i - 1][j]
-		     + 1.0 * image[i - 1][j + 1]
-		     + 0.4 * image[i - 1][j + 2]
-		     - 0.4 * image[i + 1][j - 2]
-		     - 1.0 * image[i + 1][j - 1]
-		     - 2.0 * image[i + 1][j]
-		     - 1.0 * image[i + 1][j + 1]
-		     - 0.4 * image[i + 1][j + 2]
-		     - 0.5 * image[i + 2][j - 2]
-		     - 0.8 * image[i + 2][j - 1]
-		     - 1.0 * image[i + 2][j + 1]
-		     - 0.8 * image[i + 2][j + 1]
-		     - 0.5 * image[i + 2][j + 2]
-		     );
-	}
+      {
+	for(j=2; j<width-2; j++)
+	  {
+	    // apply Sobel operator
+	    value[i][j] =
+	      (gray_t)(
+		        +0.5 * image[i - 2][j - 2]
+		       + 0.8 * image[i - 2][j - 1]
+		       + 1.0 * image[i - 2][j    ]
+		       + 0.8 * image[i - 2][j + 1]
+		       + 0.5 * image[i - 2][j + 2]
+		       + 0.4 * image[i - 1][j - 2]
+		       + 1.0 * image[i - 1][j - 1]
+		       + 2.0 * image[i - 1][j    ]
+		       + 1.0 * image[i - 1][j + 1]
+		       + 0.4 * image[i - 1][j + 2]
+		       - 0.4 * image[i + 1][j - 2]
+		       - 1.0 * image[i + 1][j - 1]
+		       - 2.0 * image[i + 1][j    ]
+		       - 1.0 * image[i + 1][j + 1]
+		       - 0.4 * image[i + 1][j + 2]
+		       - 0.5 * image[i + 2][j - 2]
+		       - 0.8 * image[i + 2][j - 1]
+		       - 1.0 * image[i + 2][j + 1]
+		       - 0.8 * image[i + 2][j + 1]
+		       - 0.5 * image[i + 2][j + 2]
+		       );
+	  }
+      }
   }
 }
 
@@ -230,8 +241,7 @@ static void
 /* edge detection with Sobel operator */
 
 int
-  edgedetect_sobel (
-        int height,          // I: image height
+  edgedetect_sobel (int height,          // I: image height
 		    int width,           // I: image width
 		    gray_t gray_image[height][width],     // I: inout image
 		    gray_t strength[height][width],       // O: strength values
@@ -245,44 +255,54 @@ int
   int tmp_image2[height][width];
 
 
-  // just for reproducable checksums...
-  memset(tmp_image1, 0, height*width*sizeof(tmp_image1[0][0]));
-  memset(tmp_image2, 0, height*width*sizeof(tmp_image2[0][0]));
+  /* use 5x5 Sobel */
+#define edgedetect_sobel_filter(w,h,g,t,v) edgedetect_sobel5x5(w,h,g,t,v)
 
-  /*--------------------------------------------------------------------------*/
 
-  /* apply algorithm */
+  // start timing
   t0 = gettime();
+
+  // just for reproducable checksums...
+  for(i=0; i<height; i++)
+    {
+      for(j=0; j<width; j++)
+	{
+	  tmp_image1[i][j] = tmp_image2[i][j] = 0;
+	}
+    }
 
 #pragma omp parallel private(dx,dy,tmp,j)
 {
-  /* use 5x5 Sobel */
-#define edgedetect_sobel(w,h,g,t,v) edgedetect_sobel5x5(w,h,g,t,v)
 
   /* Sobel x direction */
-  edgedetect_sobel(height, width, gray_image, tmp_image1, 0);
+  edgedetect_sobel_filter(height, width, gray_image, tmp_image1, 0);
 
   /* Sobel y direction */
-  edgedetect_sobel(height, width, gray_image, tmp_image2, 1);
+  edgedetect_sobel_filter(height, width, gray_image, tmp_image2, 1);
 
   /* calculate strength and direction */
-#pragma omp for private(j)
+  #pragma omp for private(j)
   for(i=0; i<height; i++)
-    for(j=0; j<width; j++) {
-      /* strength (mapped to gray scale) */
-      dx = tmp_image1[i][j];
-      dy = tmp_image2[i][j];
-      tmp = (gray_t) sqrt (dx * dx + dy * dy);
-      strength[i][j] = min (max (GRAY_MIN, tmp), GRAY_MAX);
+    {
+      for(j=0; j<width; j++)
+	{
+	  /* strength (mapped to gray scale) */
+	  dx = tmp_image1[i][j];
+	  dy = tmp_image2[i][j];
+	  tmp = (gray_t) sqrt (dx * dx + dy * dy);
+	  strength[i][j] = min (max (GRAY_MIN, tmp), GRAY_MAX);
 
-      /* direction (mapped to gray scale) */
-      tmp = (atan2 (dy, dx) + PI) / (2.0 * PI) * (double) GRAY_MAX;
-      direction[i][j] = (gray_t) tmp;
+	  /* direction (mapped to gray scale) */
+	  tmp = (atan2 (dy, dx) + PI) / (2.0 * PI) * (double) GRAY_MAX;
+	  direction[i][j] = (gray_t) tmp;
+	}
     }
+
 }
 
+  // end timing
   t1 = gettime();
-  printf("time Sobel filter          : %.6f s\n", t1-t0);
+  printf("time Sobel filter          : %.6f\n", t1-t0);
 
   unsigned long cs = checksum(height, width, direction);
   if(cs != REFERENCE_CHECKSUM_SOBEL)
