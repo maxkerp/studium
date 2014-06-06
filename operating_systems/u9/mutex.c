@@ -24,8 +24,8 @@
   // one for the mutexes. Every account has his one mutex
   // this we allocate them on the heap there are globally
   // visible.
-  pthread_mutex_t account_mutexes[NUM_ACCS];
-  volatile float account_balances[NUM_ACCS];
+ pthread_mutex_t account_mutexes[NUM_ACCS];
+ volatile float account_balances[NUM_ACCS];
 
 //===========================================================================
 // the function wich transfers the money, we lock/unlock the mutex here
@@ -37,11 +37,11 @@ process_transfer (int from_acct, int to_acct, float amount)
       to_acct);
 
   pthread_mutex_lock(&account_mutexes[from_acct]);
-  account_balances[from_acct] = account_balances[from_acct] - amount;
+  account_balances[from_acct] -= amount;
   pthread_mutex_unlock(&account_mutexes[from_acct]);
 
   pthread_mutex_lock(&account_mutexes[to_acct]);
-  account_balances[from_acct] = account_balances[from_acct] + amount;
+  account_balances[from_acct] += amount;
   pthread_mutex_unlock(&account_mutexes[to_acct]);
 
   return 0;
@@ -58,7 +58,7 @@ thread_fun ( void *args)
   // generate random amount of money to be transferred
   float amount = ((float) rand() / (float) (RAND_MAX)) * 10000.0;
 
-  int i = process_transfer(transfer_args[0], transfer_args[1], amount);
+  process_transfer(transfer_args[0], transfer_args[1], amount);
 
   return NULL;
 }
