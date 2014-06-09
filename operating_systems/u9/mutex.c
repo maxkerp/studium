@@ -14,23 +14,40 @@
  * The following program does exactly that.
  */
 #include <stdio.h>      // printf(), etc..
-#include <stdlib.h>     // calloc()
+#include <stdlib.h>     // exit()
 #include <pthread.h>    // pthread_create(), *_mutex_lock(), *_mutex_unlock()
 
 #define NUM_ACCS 6
 #define NUM_THREADS 3
 
 // We create two arrays, one for the account balances and
-  // one for the mutexes. Every account has his one mutex
-  // this we allocate them on the heap there are globally
-  // visible.
- pthread_mutex_t account_mutexes[NUM_ACCS];
- volatile float account_balances[NUM_ACCS];
+// one for the mutexes. Every account has his one mutex
+// Since they are defined in no function they're visible and globally
+// accesible in all threads.
+pthread_mutex_t account_mutexes[NUM_ACCS];
+volatile float account_balances[NUM_ACCS];
+
+//===========================================================================
+// for pretty output
+void
+print_balances ( void )
+{
+  int i;
+
+  for (i = 0; i < NUM_ACCS; i++) {
+    printf("Account #%d: %.2f€. | ", i, account_balances[i]);
+    if ( i == (NUM_ACCS-1) )
+    {
+      printf("\n");
+    }
+  }
+
+}
 
 //===========================================================================
 // the function wich transfers the money, we lock/unlock the mutex here
 int
-process_transfer (int from_acct, int to_acct, float amount)
+process_transfer ( int from_acct, int to_acct, float amount )
 {
 
   printf("  ...transfering %.2f€ from Account#%d to Account#%d\n", amount, from_acct,
@@ -41,7 +58,7 @@ process_transfer (int from_acct, int to_acct, float amount)
   pthread_mutex_unlock(&account_mutexes[from_acct]);
 
   pthread_mutex_lock(&account_mutexes[to_acct]);
-  account_balances[from_acct] += amount;
+  account_balances[to_acct] += amount;
   pthread_mutex_unlock(&account_mutexes[to_acct]);
 
   return 0;
@@ -51,7 +68,7 @@ process_transfer (int from_acct, int to_acct, float amount)
 //===========================================================================
 // the function wich is executed by each thread
 void *
-thread_fun ( void *args)
+thread_fun ( void *args )
 {
   int *transfer_args = args;
 
@@ -65,38 +82,37 @@ thread_fun ( void *args)
 
 //================================================================================
 // MAIN
-int main ( int argc, char **argv)
+int
+main ( int argc, char **argv )
 {
   int i;
+  pthread_t threads[NUM_THREADS];
   // seeding rand so we allways get diffrent balances
   srand( (unsigned int) time(NULL) );
 
 
-
+  // initialize mutexes and generate random account balances
   for( i = 0; i < NUM_ACCS; i++) {
     pthread_mutex_init( &account_mutexes[i], NULL);
     account_balances[i] = ((float) rand() / (float) (RAND_MAX)) * 100000.0;
-
-    printf("Account #%d: %.2f€.\n", i, account_balances[i]);
   }
+
+  print_balances();
 
   int transfer_args[3][2] = { {0,1}, {1,2}, {4,5} };
 
-  // I will create 3 threads, 2 of them will access the same data.
-
-  pthread_t threads[NUM_THREADS];
+  // create threads and start them
   for ( i = 0; i < NUM_THREADS; i++) {
     pthread_create(&threads[i], NULL, thread_fun, &transfer_args[i]);
   }
 
-
+  // wait for threads to be done
   for ( i = 0; i < NUM_THREADS; i++) {
     pthread_join(threads[i], NULL);
   }
 
-  for (i = 0; i < NUM_ACCS; i++) {
-    printf("Account #%d: %.2f€.\n", i, account_balances[i]);
-  }
+  print_balances();
 
-  return 0;
+
+  return EXIT_SUCCESS;
 }
