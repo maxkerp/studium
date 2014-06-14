@@ -12,6 +12,9 @@
  * that two transfers on the same account won't mess up the data
  * you have to lock the access to one account with a mutex.
  * The following program does exactly that.
+ *
+ * compile with:
+ * gcc -Wall -g mutex.c -o mutex -lpthread
  */
 #include <stdio.h>      // printf(), etc..
 #include <stdlib.h>     // exit()
