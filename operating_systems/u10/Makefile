@@ -1,6 +1,5 @@
-CFLAGS=-Wall -g
-LDFLAGS=-lpthread
-CC=cc
+CFLAGS=-Wall -g -std=gnu99
+CC=gcc
 
 all:
 	$(CC) $(CFLAGS) %.c -o $<

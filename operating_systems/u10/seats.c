@@ -30,6 +30,8 @@
 #include <unistd.h>    // write(), read(), lseek(), lockf(),
                        // sleep(), getopt()
 #include <sys/types.h> // lseek()
+#include <fcntl.h>     // for FLAGS O_WRONLY in open(
+#include <string.h>    // strlen()
 
 //==============================================================================
 // dummy function
@@ -39,7 +41,40 @@ dummy_func (const char *string)
   printf(string);
 }
 
+//==============================================================================
+// function which creates the seatfile.txt file
+int
+create_seats (int num_flights, int num_seats)
+{
+  printf("Creating %d data sets with an initial number of %d seats...\n",
+      num_flights, num_seats);
 
+  char *buf = "This is a test\n";
+  int seatfile = open("./seatfile.txt", O_WRONLY | O_CREAT, S_IRWXU);
+  for (int i = 0; i < num_flights; i++){
+    write(seatfile, buf, strlen(buf));
+  }
+  close(seatfile);
+  return 0;
+}
+
+//==============================================================================
+// function to list all seats
+int
+list_seats(void)
+{
+
+  return 0;
+}
+
+//==============================================================================
+// function selling a seat
+int
+sell_seat (int flight_id)
+{
+  printf("Selling 1 seat on flight %d\n", flight_id);
+  return 0;
+}
 //==============================================================================
 // MAIN
 int
@@ -51,11 +86,11 @@ main (int argc, char **argv)
   while ( (ch = getopt(argc, argv, "c:s:l")) != EOF )
   {
     switch (ch) {
-    case 'c': dummy_func("in create\n");
+    case 'c': create_seats(atoi(argv[optind - 1]), atoi(argv[optind]));
               break;
     case 'l': dummy_func("in list\n");
               break;
-    case 's': dummy_func("in sell\n");
+    case 's': sell_seat(atoi(argv[optind - 1]));
               break;
     default:  fprintf(stderr, "Usage: %s [-c flights seats] [-l] [-s flight]\n",
                   argv[0]);
