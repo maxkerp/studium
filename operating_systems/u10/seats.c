@@ -2,8 +2,8 @@
  * Author:  Maximilain Kerp
  * Group:   5
  * Date:    June 14th, 2014
- * Pirpose: This program shows the use of lseek() and
- *          flock(). It is very simple to use.
+ * Purpose: This program shows the use of lseek() and
+ *          lockf().
  *
  * Usage:
  *
@@ -49,7 +49,7 @@ int sell_seat (int flight_id);
 // MAIN
 int main (int argc, char **argv)
 {
-  // telling getopts not to throw errors we handle that ourselves
+  // telling getopts not to throw errors, we handle that ourselves
   opterr = 0;
   // opt will be set to the option argument by getopt()
   int opt;
