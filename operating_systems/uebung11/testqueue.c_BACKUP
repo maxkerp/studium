@@ -1,0 +1,129 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+
+//this is the testprogram to create and receive messages from system queue
+int main (int argc, char **argv) {
+
+  //create placeholder for upcoming 5 threads
+  pid_t myPid1;
+  pid_t myPid2;
+  pid_t myPid3;
+  pid_t myPid4;
+  pid_t myPid5;
+
+  //variable for the key attribute
+  char *msgkey = "100";
+
+  //variables for types and messages values
+  char *msgtype1 = "4";
+  char *msgval1 = "Hallo1";
+  char *msgtype2 = "8";
+  char *msgval2 = "Hallo2";
+  char *msgtype3 = "9";
+  char *msgval3 = "Hallo3";
+  char *msgtype4 = "7";
+  char *msgval4 = "Hallo4";
+
+  //create 1 thread and try to create a message using execlp with sendmessage
+  //and wait for finish
+  myPid1 = fork();
+  if (myPid1 < 0) {
+    printf("thread 1 error\n");
+  } else {
+    sleep(1);
+    execlp("./sendmessage", "./sendmessage", msgkey, msgtype1, msgval1, NULL);
+    printf("Thread 1 created\n");
+  }
+  waitpid(myPid1, NULL, 0);
+
+  //create 2 thread and try to create a message using execlp with sendmessage
+  //and wait for finish
+  myPid2 = fork();
+  if (myPid2 < 0) {
+    printf("thread 2 error\n");
+  } else {
+    sleep(2);
+    execlp("./sendmessage", "./sendmessage", msgkey, msgtype2, msgval2, NULL);
+    printf("Thread 2 created\n");
+  }
+  waitpid(myPid2, NULL, 0);
+
+  //create 3 thread and try to create a message using execlp with sendmessage
+  //and wait for finish
+  myPid3 = fork();
+  if (myPid3 < 0) {
+    printf("thread 3 error\n");
+  } else {
+    sleep(3);
+    execlp("./sendmessage", "./sendmessage", msgkey, msgtype3, msgval3, NULL);
+    printf("Thread 3 created\n");
+  }
+  waitpid(myPid3, NULL, 0);
+
+  //create 4 thread and try to create a message using execlp with sendmessage
+  //and wait for finish
+  myPid4 = fork();
+  if (myPid4 < 0) {
+    printf("thread 4 error\n");
+  } else {
+    sleep(4);
+    execlp("./sendmessage", "./sendmessage", msgkey, msgtype4, msgval4, NULL);
+    printf("Thread 4 created\n");
+  }
+  waitpid(myPid4, NULL, 0);
+
+  exit(0);
+
+  //Now show if available messages are in the system queue
+  myPid5 = fork();
+  if (myPid5 < 0) {
+    printf("thread 5 error\n");
+  } else {
+    execlp("ipcs", "ipcs", " -a", NULL);
+  }
+  waitpid(myPid5, NULL, 0);
+
+  exit(1);
+  //receive message no. 1
+  myPid1 = fork();
+  if (myPid1 < 0) {
+    printf("thread 1 error\n");
+  } else {
+    execlp("./receivemessage", "./receivemessage", "100", "8", NULL);
+  }
+
+  //receive message no. 2
+  myPid2 = fork();
+  if (myPid2 < 0) {
+    printf("thread 2 error\n");
+  } else {
+    execlp("./receivemessage", "./receivemessage", "100", "4", NULL);
+  }
+
+  //receive message no. 3
+  myPid3 = fork();
+  if (myPid3 < 0) {
+    printf("thread 3 error\n");
+  } else {
+    execlp("./receivemessage", "./receivemessage", "100", "7", NULL);
+  }
+
+  //wait until all messages are received
+  waitpid(myPid1, NULL, 0);
+  waitpid(myPid2, NULL, 0);
+  waitpid(myPid3, NULL, 0);
+
+  //Now show if available messages are in the system queue
+  myPid5 = fork();
+  if (myPid5 < 0) {
+    printf("thread 5 error\n");
+  } else {
+    execlp("ipcs", "ipcs");
+  }
+  waitpid(myPid5, NULL, 0);
+
+  printf("Testprogram finished.\n");
+  exit(0);
+}

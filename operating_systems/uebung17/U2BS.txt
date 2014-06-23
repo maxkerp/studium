@@ -1,0 +1,92 @@
+###############################################################################
+## Name: Heiko Kernbach›› › › › › › › ›                                      ##
+## Matrikelnummer: 9019307› › › › › › › ›                                    ##
+## Gruppe: 5› › › › › › › › › › ›                                            ##
+## Erstellungsdatum: 14.04.2014                                              ##
+## Funktionsumfang: Laden/Benutzen einer eigenen dynamischen Library         ##
+## Info: Blatt beidseitig bedruck                                            ##
+###############################################################################
+
+//mylib.h
+
+#ifndef mylib_h__
+#define mylib_h__
+
+extern void globalFunction(void);
+extern static void localFunction(void);
+
+#endif
+_______________________________________________________________________________
+
+//mylib.c
+
+#include <stdio.h>
+
+void publicFunction(void) {
+  puts("Hello, I'm a public function");
+}
+
+static void privateFunction (void) {
+  puts("Hello, I'm a private function");
+}
+
+typedef void (* privateFunctionPointer)();
+
+privateFunctionPointer privateHelper() {
+  return &privateFunction;
+}
+_______________________________________________________________________________
+
+//uebung17.c
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <dlfcn.h>
+
+int main(void) {
+
+  void *handle;
+  void (*globalFunc)(void);
+  char *error;
+
+  typedef void (* privateFuncPtr)();
+  typedef privateFuncPtr (* privateFunctionPointer)();
+
+  //Öffnen der Library
+  handle = dlopen ("/Users/hkernbach/FH/BS/uebung17/mylib.so", RTLD_LAZY);
+
+  if (!handle) {
+  //Falls handle nicht vorhanden, brich ab
+    fputs (dlerror(), stderr);
+    exit(1);
+  }
+
+  //Benutzen einer lokalen Funtion d. Library
+  privateFunctionPointer privHelper = (privateFunctionPointer)   \
+  dlsym(handle, "privateHelper");
+  privateFuncPtr localFunc = privHelper();
+
+  //Benutzen einer globalen Funktion d. Library
+  globalFunc = dlsym(handle, "publicFunction");
+
+  if ((error = dlerror()) != NULL)  {
+  //Beende falls Fehler vorgekommen ist
+    fputs(error, stderr);
+    exit(1);
+  }
+
+  //Gebe Ergebnis der Funktion aus
+  localFunc();
+  globalFunc();
+  //Beende das Binden der dyn. Library
+  dlclose(handle);
+
+  //Beende die Funktion
+  return 0;
+}
+_______________________________________________________________________________
+
+Durchführung:
+1. gcc -c -Wall -Werror -fpic mylib.c
+2. gcc -shared -o mylib.so mylib.o
+3. gcc -Wall -o execU17 uebung17.c -ldl
