@@ -1,0 +1,71 @@
+Programm wird ausgeführt auf  wr6
+***************************** 1 ****************************
+./image.exe -n Test.tiff
+time Laplace edge detection: 0.384387 s
+checksum Laplace OK        : 217015525
+time Laplace edge detection: 0.082347 s
+checksum Laplace OK        : 217015525
+time Sobel filter          : 5.272570
+checksum Sobel OK          : 302231239
+time Sobel filter          : 5.213014
+checksum Sobel OK          : 302231239
+***************************** 16 ****************************
+./image.exe -n Test.tiff
+time Laplace edge detection: 0.339269 s
+checksum Laplace OK        : 217015525
+time Laplace edge detection: 0.011142 s
+checksum Laplace OK        : 217015525
+time Sobel filter          : 0.412281
+checksum Sobel OK          : 302231239
+time Sobel filter          : 0.351438
+checksum Sobel OK          : 302231239
+***************************** 32 ****************************
+./image.exe -n Test.tiff
+time Laplace edge detection: 0.338632 s
+checksum Laplace OK        : 217015525
+time Laplace edge detection: 0.009642 s
+checksum Laplace OK        : 217015525
+time Sobel filter          : 0.249710
+checksum Sobel OK          : 302231239
+time Sobel filter          : 0.187977
+checksum Sobel OK          : 302231239
+***************************** 64 ****************************
+./image.exe -n Test.tiff
+time Laplace edge detection: 0.382195 s
+checksum Laplace OK        : 217015525
+time Laplace edge detection: 0.012307 s
+checksum Laplace OK        : 217015525
+time Sobel filter          : 0.256045
+checksum Sobel OK          : 302231239
+time Sobel filter          : 0.133817
+checksum Sobel OK          : 302231239
+***************************** 128 ****************************
+./image.exe -n Test.tiff
+time Laplace edge detection: 0.440737 s
+checksum Laplace OK        : 217015525
+time Laplace edge detection: 0.012494 s
+checksum Laplace OK        : 217015525
+time Sobel filter          : 0.226906
+checksum Sobel OK          : 302231239
+time Sobel filter          : 0.108505
+checksum Sobel OK          : 302231239
+***************************** 160 ****************************
+./image.exe -n Test.tiff
+time Laplace edge detection: 0.472612 s
+checksum Laplace OK        : 217015525
+time Laplace edge detection: 0.013567 s
+checksum Laplace OK        : 217015525
+time Sobel filter          : 0.213279
+checksum Sobel OK          : 302231239
+time Sobel filter          : 0.094458
+checksum Sobel OK          : 302231239
+***************************** 240 ****************************
+./image.exe -n Test.tiff
+time Laplace edge detection: 0.547783 s
+checksum Laplace OK        : 217015525
+time Laplace edge detection: 0.014291 s
+checksum Laplace OK        : 217015525
+time Sobel filter          : 0.162958
+checksum Sobel OK          : 302231239
+time Sobel filter          : 0.100742
+checksum Sobel OK          : 302231239
